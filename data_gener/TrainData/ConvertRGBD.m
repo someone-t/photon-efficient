@@ -7,6 +7,7 @@ datasetDir = './raw';
 scenes = ls(datasetDir);
 scenes = regexp(scenes, '(\s+|\n)', 'split');
 scenes(end) = [];
+camera_params;
 
 for ss = 1:length(scenes)
     sceneName = scenes{ss};
