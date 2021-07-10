@@ -28,7 +28,7 @@ for ss = 1:length(scenes)
     % Displays each pair of synchronized RGB and Depth frames.
     idx = 1: 10 : numel(frameList);
   
-    for ii = 209:length(idx)
+    for ii = 1:length(idx) %change from 209 to 1
         % Check if already exists
         depth_out = sprintf('%s/depth_%04d.mat', outdir, idx(ii));
         albedo_out = sprintf('%s/albedo_%04d.mat', outdir, idx(ii));
@@ -42,11 +42,10 @@ for ss = 1:length(scenes)
                 disp('continuing');
                 continue;
         end
-        
-        hk=idx(1);   
+       
         try
-            imgRgb = imread( frameList(idx(ii)).rawRgbFilename);
-            imgDepthRaw = swapbytes(imread( frameList(idx(ii)).rawDepthFilename));
+            imgRgb = imread([sceneDir '/' frameList(idx(ii)).rawRgbFilename]); % change in 2021/07/10
+            imgDepthRaw = swapbytes(imread([sceneDir '/' frameList(idx(ii)).rawDepthFilename])); % change in 2021/07/10
 
             % Crop the images to include the areas where we have depth information.
             imgRgb = crop_image(imgRgb);
