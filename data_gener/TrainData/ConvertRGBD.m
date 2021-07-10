@@ -1,24 +1,25 @@
+
 % The directory where you extracted the raw dataset.
+clear all;close all;clc
 addpath(genpath('./intrinsic_texture'));
-addpath('./nyu_utils');
+addpath('nyu_utils');
 datasetDir = './raw';
 
-% Get the scene names
+% get the scene names
 scenes = ls(datasetDir);
 scenes = regexp(scenes, '(\s+|\n)', 'split');
 scenes(end) = [];
 camera_params;
 
-for ss = 1:length(scenes)
+t_s = tic;
+for ss = 1:length(scenes) % original is parfor
     sceneName = scenes{ss};
     
     disp('starting!');
 
     % The name of the scene to demo.
     outdir = ['./processed/' sceneName];
-    if ~exist(outdir, 'dir')
-        mkdir(outdir);
-    end
+    mkdir(outdir);
 
     % The absolute directory of the 
     sceneDir = sprintf('%s/%s', datasetDir, sceneName);
@@ -27,10 +28,10 @@ for ss = 1:length(scenes)
     frameList = get_synched_frames(sceneDir);
 
     % Displays each pair of synchronized RGB and Depth frames.
-    idx = 1: 10 : numel(frameList);
-  
-    for ii = 1:length(idx) %change from 209 to 1
-        % Check if already exists
+    idx = 1 : 10 : numel(frameList);
+    
+    for ii = 1:length(idx)
+        % check if already exists
         depth_out = sprintf('%s/depth_%04d.mat', outdir, idx(ii));
         albedo_out = sprintf('%s/albedo_%04d.mat', outdir, idx(ii));
         intensity_out = sprintf('%s/intensity_%04d.mat', outdir, idx(ii));
@@ -43,10 +44,10 @@ for ss = 1:length(scenes)
                 disp('continuing');
                 continue;
         end
-       
+        
         try
-            imgRgb = imread([sceneDir '/' frameList(idx(ii)).rawRgbFilename]); % change in 2021/07/10
-            imgDepthRaw = swapbytes(imread([sceneDir '/' frameList(idx(ii)).rawDepthFilename])); % change in 2021/07/10
+            imgRgb = imread([sceneDir '/' frameList(idx(ii)).rawRgbFilename]);
+            imgDepthRaw = swapbytes(imread([sceneDir '/' frameList(idx(ii)).rawDepthFilename]));
 
             % Crop the images to include the areas where we have depth information.
             imgRgb = crop_image(imgRgb);
@@ -54,7 +55,7 @@ for ss = 1:length(scenes)
             imgDepthAbs = crop_image(imgDepthProj);
             imgDepthFilled = fill_depth_cross_bf(imgRgb, double(imgDepthAbs));
           
-            % Get distance from the depth image
+            % get distance from the depth image
             cx = cx_d - 41 + 1;
             cy = cy_d - 45 + 1;
             [xx,yy] = meshgrid(1:561, 1:427);
@@ -63,7 +64,7 @@ for ss = 1:length(scenes)
             Z = imgDepthFilled;
             imgDist_hr = sqrt(X.^2 + Y.^2 + Z.^2);
            
-            % Estimate the albedo image and save the outputs
+            % estimate the albedo image and save the outputs
             I = im2double(imgRgb);
             I = imresize(I, [512, 512], 'bilinear');
             imgDepthFilled = imresize(imgDepthFilled, [512,512], 'bilinear');
@@ -85,3 +86,5 @@ for ss = 1:length(scenes)
         end
     end
 end
+t_cost = toc(t_s);
+disp(['Time spend: ', num2str(t_cost/3600/24), ' days']);
