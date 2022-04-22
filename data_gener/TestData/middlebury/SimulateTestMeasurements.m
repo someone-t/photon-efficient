@@ -184,6 +184,7 @@ for ss = 1:length(scenes)
         % the 'spad' is the simulated data, 'depth' is the GT 2D depth map,
         % which is 72*88, 'depth_hr' is 576*704. 'intensity' is the
         % gray image, 72*88. 'rates' is actually the GT 3D histogram.
+        % there will be possible dimension transpose in saving data and sparse function here, if you find the test results are strange or transposed, please check your saving config.
         if LOW_RES
             out_fname = sprintf('%s/LR_%s_%s_%s.mat', outdir, scenes{ss}, num2str(mean_signal_photons), num2str(mean_background_photons));
             save(out_fname, 'spad', 'depth', 'SBR', 'mean_signal_photons', 'mean_background_photons', 'bin_size','intensity','intensity_hr', 'depth_hr', 'range_bins');
