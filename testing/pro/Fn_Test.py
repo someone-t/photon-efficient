@@ -29,7 +29,7 @@ def test_sm(model, opt, outdir_m):
         
         M_mea = scio.loadmat(name_test)["spad"]
         M_mea = scipy.sparse.csc_matrix.todense(M_mea)
-        M_mea = np.asarray(M_mea).astype(np.float32).reshape([1, 1, h, w, -1])
+        M_mea = np.asarray(M_mea).astype(np.float32).reshape([1, 1, h, w, -1])  #note that there would be dimension transpose if data is generated with some different settings, so if you find the results are strange or transposed, please check the dimension here and that in test data generating.
         M_mea = torch.from_numpy(np.transpose(M_mea, (0, 1, 4, 2, 3))).type(dtype)
 
         t_s = time.time()
